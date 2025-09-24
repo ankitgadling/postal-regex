@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "country_code",
+      "country_name",
+      "postal_code_regex",
+      "sample_valid",
+      "sample_invalid"
+    ],
+    "properties": {
+      "country_code": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$",
+        "description": "ISO 3166-1 alpha-2 country code"
+      },
+      "country_name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "postal_code_regex": {
+        "type": "string",
+        "description": "Regex for validating postal codes"
+      },
+      "sample_valid": {
+        "type": "string",
+        "description": "A valid postal code sample for this country"
+      },
+      "sample_invalid": {
+        "type": "string",
+        "description": "An invalid postal code sample for this country"
+      }
+    },
+    "additionalProperties": false
+  }
+}
