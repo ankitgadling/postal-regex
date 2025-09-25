@@ -3,15 +3,15 @@ from pathlib import Path
 import json
 import pytest
 
+# Add src folder to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))
 
-
 from postal_regex import validator
 
-
-DATA_FILE = PROJECT_ROOT / "data" / "postal_codes.json"
+# Load JSON the same way validator.py does
+DATA_FILE = SRC_DIR / "postal_regex" / "data" / "postal_codes.json"
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     POSTAL_CODES = json.load(f)
 

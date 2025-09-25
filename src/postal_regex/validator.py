@@ -3,17 +3,17 @@ import re
 from pathlib import Path
 from functools import lru_cache
 
-from pathlib import Path
+# # Path relative to this file
+# DATA_FILE = Path(__file__).parent / "data" / "postal_codes.json"
 
+# with open(DATA_FILE, "r", encoding="utf-8") as f:
+#     _raw_data = json.load(f)
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_FILE = PROJECT_ROOT / "data" / "postal_codes.json"
+# Access postal_codes.json inside the installed package
+from importlib.resources import files
+DATA_FILE = files("postal_regex.data") / "postal_codes.json"
 
-with open(DATA_FILE, "r", encoding="utf-8") as f:
-    _raw_data = json.load(f)
-
-
-with open(DATA_FILE, "r", encoding="utf-8") as f:
+with DATA_FILE.open("r", encoding="utf-8") as f:
     _raw_data = json.load(f)
 
 BY_CODE = {}

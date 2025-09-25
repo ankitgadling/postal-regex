@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "postal_regex"
-version = "0.1.0"
+version = "0.1.3"
 description = "Postal code regex validator"
 authors = [
     {name="Ankit Gadling", email="ankitgadling2@gmail.com"}
@@ -17,3 +17,6 @@ dependencies = []
 [tool.setuptools]
 packages = ["postal_regex"]
 package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+postal_regex = ["data/*.json"]
