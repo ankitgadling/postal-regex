@@ -15,6 +15,11 @@ This project is ideal for **form validation, data cleaning, and big data applica
 - ✅ Ready for **big data frameworks** like Spark, Dask, or Pandas  
 
 ---
+## Installation
+
+```bash
+pip install postal-regex
+```
 
 ## Usage
 
@@ -34,4 +39,5 @@ normalize("US")                   # "US"
 get_supported_countries()
 # [{'code': 'IN', 'name': 'India'}, {'code': 'US', 'name': 'United States'}, ...]
 
+```
 ---
