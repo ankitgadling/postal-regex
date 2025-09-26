@@ -1,8 +1,2 @@
-# For running tests
-pytest>=7.0
-
 # For JSON schema validation
 jsonschema>=4.0
-
-# Optional: for type checking or linting
-flake8>=6.0

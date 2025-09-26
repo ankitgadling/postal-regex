@@ -7,6 +7,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_FILE = PROJECT_ROOT / "src" / "postal_regex" / "data" / "postal_codes.json"
 SCHEMA_FILE = PROJECT_ROOT / "src" / "postal_regex" / "data" / "schema.json"
 
+
 def test_json_schema():
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)

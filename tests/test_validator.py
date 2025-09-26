@@ -17,6 +17,7 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
 
 # ----------------- Tests -----------------
 
+
 @pytest.mark.parametrize("entry", POSTAL_CODES)
 def test_validate_samples(entry):
     code = entry["country_code"]
