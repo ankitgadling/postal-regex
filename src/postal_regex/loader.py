@@ -49,3 +49,13 @@ def export_parquet(output_path: Union[str, Path]) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(output_path, index=False)
     return output_path
+
+# ---------- CSV Saver ----------
+def export_csv(output_path: Union[str, Path]) -> Path:
+    """Export postal codes to a CSV file."""
+
+    df = load_pandas()
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index=False)
+    return output_path

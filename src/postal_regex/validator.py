@@ -1,49 +1,87 @@
 import json
 import re
 from functools import lru_cache
-
-
-# Access postal_codes.json inside the installed package
+from dataclasses import dataclass
 from importlib.resources import files
 
+# ---------------------------
+# Data Loading
+# ---------------------------
 DATA_FILE = files("postal_regex.data") / "postal_codes.json"
 
 with DATA_FILE.open("r", encoding="utf-8") as f:
     _raw_data = json.load(f)
 
+
+@dataclass(frozen=True)
+class CountryRecord:
+    country_code: str
+    country_name: str
+    regex: re.Pattern
+
+
+# Build lookup tables
 BY_CODE = {}
-BY_NAME = {}
+COUNTRY_INDEX = {}
 
 for entry in _raw_data:
     compiled = re.compile(entry["postal_code_regex"])
-    record = {
-        "country_code": entry["country_code"],
-        "country_name": entry["country_name"],
-        "regex": compiled,
-    }
-    BY_CODE[entry["country_code"].upper()] = record
-    BY_NAME[entry["country_name"].upper()] = record
+    record = CountryRecord(
+        country_code=entry["country_code"],
+        country_name=entry["country_name"],
+        regex=compiled,
+    )
+    code = entry["country_code"].upper()
+    name = entry["country_name"].upper()
+    BY_CODE[code] = record
+    COUNTRY_INDEX[code] = record
+    COUNTRY_INDEX[name] = record
 
 
+# ---------------------------
+# Core Functions
+# ---------------------------
 @lru_cache(maxsize=None)
 def normalize(identifier: str) -> str:
-    identifier = identifier.strip().upper()
-    entry = BY_CODE.get(identifier) or BY_NAME.get(identifier)
+    """
+    Normalize a country identifier (code or name) to its ISO 3166-1 alpha-2 code.
+    """
+    key = identifier.strip().upper()
+    entry = COUNTRY_INDEX.get(key)
     if not entry:
         raise ValueError(f"No match found for '{identifier}'")
-    return entry["country_code"]
+    return entry.country_code
+
+
+def get_entry(identifier: str) -> CountryRecord:
+    """
+    Retrieve the CountryRecord for a given country identifier.
+    """
+    code = normalize(identifier)
+    return BY_CODE[code]
 
 
 @lru_cache(maxsize=None)
 def validate(country_identifier: str, postal_code: str) -> bool:
-    identifier = country_identifier.strip().upper()
-    entry = BY_CODE.get(identifier) or BY_NAME.get(identifier)
-    if not entry:
-        raise ValueError(f"No regex found for '{country_identifier}'")
-    return bool(entry["regex"].match(postal_code))
+    """
+    Validate a postal code against the regex pattern for a given country.
+    """
+    entry = get_entry(country_identifier)
+    return bool(entry.regex.fullmatch(postal_code))
 
 
 def get_supported_countries():
+    """
+    Retrieve supported countries for postal code validation.
+    """
     return [
-        {"code": v["country_code"], "name": v["country_name"]} for v in BY_CODE.values()
+        {"code": rec.country_code, "name": rec.country_name} for rec in BY_CODE.values()
     ]
+
+
+def get_country_regex(country_identifier: str) -> str:
+    """
+    Retrieve the postal code regex pattern for a given country.
+    """
+    entry = get_entry(country_identifier)
+    return entry.regex.pattern
