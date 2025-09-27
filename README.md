@@ -7,7 +7,7 @@ This project is ideal for **form validation, data cleaning, and big data applica
 
 ## Features
 
-- ✅ 25+ countries included, with postal code regex patterns  
+- ✅ 35+ countries included, with postal code regex patterns  
 - ✅ Supports lookup by **country code** or **country name**  
 - ✅ Precompiled regex for fast validation in Python  
 - ✅ Auto-generated tests using `sample_valid` and `sample_invalid` entries  
