@@ -1,5 +1,5 @@
 import json
-import re
+import regex  # safer regex engine with timeout support
 from functools import lru_cache
 from dataclasses import dataclass
 from importlib.resources import files
@@ -17,7 +17,7 @@ with DATA_FILE.open("r", encoding="utf-8") as f:
 class CountryRecord:
     country_code: str
     country_name: str
-    regex: re.Pattern
+    regex: regex.Pattern
 
 
 # Build lookup tables
@@ -25,7 +25,7 @@ BY_CODE = {}
 COUNTRY_INDEX = {}
 
 for entry in _raw_data:
-    compiled = re.compile(entry["postal_code_regex"])
+    compiled = regex.compile(entry["postal_code_regex"])
     record = CountryRecord(
         country_code=entry["country_code"],
         country_name=entry["country_name"],
@@ -62,12 +62,16 @@ def get_entry(identifier: str) -> CountryRecord:
 
 
 @lru_cache(maxsize=None)
-def validate(country_identifier: str, postal_code: str) -> bool:
+def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) -> bool:
     """
     Validate a postal code against the regex pattern for a given country.
+    Timeout (default 100ms) prevents ReDoS hangs.
     """
     entry = get_entry(country_identifier)
-    return bool(entry.regex.fullmatch(postal_code))
+    try:
+        return bool(entry.regex.fullmatch(postal_code, timeout=timeout))
+    except regex.TimeoutError:
+        return False  # treat timeout as invalid
 
 
 def get_supported_countries():
