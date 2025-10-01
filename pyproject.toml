@@ -33,3 +33,5 @@ update_changelog_on_bump = true
 [project.optional-dependencies]
 pandas = ["pandas>=2.0", "pyarrow>=11.0"]
 spark = ["pyspark>=4.0"]
+dask = ["dask[complete]>=2025.9.0"]
+dataframe = ["pandas>=2.0", "pyarrow>=11.0", "dask[complete]>=2025.9.0"]
