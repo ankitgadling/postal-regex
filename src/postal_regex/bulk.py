@@ -1,6 +1,15 @@
 from multiprocessing import Pool, cpu_count
-import regex
-from .validator import get_entry, normalize
+import json
+import importlib.resources as resources
+from pathlib import Path
+from typing import Union, Any, TYPE_CHECKING
+import tempfile
+from .core import get_entry, normalize, COUNTRY_INDEX
+
+if TYPE_CHECKING:
+    import pandas as pd
+    import pyspark.sql
+
 
 # ---------------------------
 # Core Bulk Functions
@@ -17,9 +26,12 @@ def bulk_validate(
     entry = get_entry(country_identifier)
 
     def _check(code):
+        if code is None or not isinstance(code, str):
+            return False  # missing or non-string -> invalid
         try:
             return bool(entry.regex.fullmatch(code, timeout=timeout))
-        except regex.TimeoutError:
+        except AttributeError:
+            # fallback if regex.TimeoutError does not exist
             return False
 
     if parallel:
@@ -42,8 +54,14 @@ def bulk_normalize(
     as_generator: bool = False,
 ):
     """Normalize an iterable of country identifiers to ISO alpha-2 codes."""
+
     def _norm(identifier):
-        return normalize(identifier)
+        if identifier is None or not isinstance(identifier, str):
+            return None
+        try:
+            return normalize(identifier)
+        except ValueError:
+            return identifier  # unknown country -> keep as-is
 
     if parallel:
         nproc = workers or cpu_count()
@@ -63,29 +81,72 @@ def bulk_normalize(
 # ---------------------------
 def validate_dataframe(df, country_col, postal_col, output_col="is_valid"):
     """
-    Validate postal codes in a Pandas or Dask DataFrame.
-    Supports both in-memory (Pandas) and distributed (Dask) workflows.
+    Validate postal codes in a Pandas or Dask DataFrame using precompiled regex lookup.
+    Fully vectorized per partition for scalability, preserves None/NaN values.
     """
-    import pandas as pd
-    import dask.dataframe as dd
+    # -----------------------------
+    # Lazy imports
+    # -----------------------------
+    try:
+        import pandas as pd
+    except ImportError:
+        pd = None
 
-    is_dask = isinstance(df, dd.DataFrame)
+    try:
+        import dask.dataframe as dd
+    except ImportError:
+        dd = None
 
-    # Normalize countries
+    if pd is None and dd is None:
+        raise ImportError(
+            "Either pandas or dask must be installed to use this function."
+        )
+
+    # Detect type
+    is_dask = dd is not None and isinstance(df, dd.DataFrame)
+    is_pandas = pd is not None and isinstance(df, pd.DataFrame)
+
+    if not (is_dask or is_pandas):
+        raise TypeError("df must be a Pandas or Dask DataFrame")
+
+    # -----------------------------
+    # Normalize country names safely
+    # -----------------------------
     def normalize_partition(part):
-        part["country_norm"] = bulk_normalize(part[country_col], as_generator=False)
+        part["country_norm"] = part[country_col].apply(
+            lambda c: None if pd.isna(c) else str(c).upper()
+        )
         return part
 
     df = df.map_partitions(normalize_partition) if is_dask else normalize_partition(df)
 
-    # Validate postal codes per partition
-    def validate_partition(part):
-        part[output_col] = part.groupby("country_norm")[postal_col].transform(
-            lambda group: bulk_validate(group.name, group, as_generator=False)
-        )
-        return part
+    # Initialize output column
+    df[output_col] = False
 
-    df = df.map_partitions(validate_partition) if is_dask else validate_partition(df)
+    # -----------------------------
+    # Vectorized validation per country
+    # -----------------------------
+    for country_name, record in COUNTRY_INDEX.items():
+        mask = df["country_norm"] == country_name.upper()
+        if is_dask:
+            # Dask: apply per partition
+            def apply_mask(part, mask_series):
+                idx = mask_series.loc[part.index]
+                if idx.any():
+                    part.loc[idx, output_col] = (
+                        part.loc[idx, postal_col]
+                        .astype(str)
+                        .str.fullmatch(record.regex.pattern)
+                    )
+                return part
+
+            df = df.map_partitions(apply_mask, mask)
+        else:
+            # Pandas: vectorized
+            df.loc[mask, output_col] = (
+                df.loc[mask, postal_col].astype(str).str.fullmatch(record.regex.pattern)
+            )
+
     return df
 
 
@@ -100,14 +161,71 @@ def validate_spark_dataframe(df, country_col, postal_col, output_col="is_valid")
     from pyspark.sql.types import BooleanType, StringType
 
     # Normalize countries UDF
-    normalize_udf = udf(lambda c: bulk_normalize([c])[0], StringType())
+    normalize_udf = udf(
+        lambda c: bulk_normalize([c])[0] if c is not None else None, StringType()
+    )
     df = df.withColumn("country_norm", normalize_udf(col(country_col)))
 
     # Validate postal codes UDF
     validate_udf = udf(
-        lambda country, postal: bulk_validate(country, [postal])[0],
-        BooleanType()
+        lambda country, postal: (
+            bool(bulk_validate(country, [postal])[0]) if postal is not None else False
+        ),
+        BooleanType(),
     )
     df = df.withColumn(output_col, validate_udf(col("country_norm"), col(postal_col)))
 
     return df
+
+
+# ---------- Core JSON Loader ----------
+def load_json() -> list[dict[str, Any]]:
+    """Load postal codes as a list of dicts (raw JSON)."""
+    with (
+        resources.files("postal_regex.data")
+        .joinpath("postal_codes.json")
+        .open("r", encoding="utf-8") as f
+    ):
+        return json.load(f)
+
+
+# ---------- Pandas Loader ----------
+def load_pandas() -> "pd.DataFrame":
+    """Load postal codes into a Pandas DataFrame."""
+    import pandas as pd  # Lazy import
+
+    return pd.DataFrame(load_json())
+
+
+# ---------- Spark Loader ----------
+def load_spark(spark_session: "pyspark.sql.SparkSession") -> "pyspark.sql.DataFrame":
+    """Load postal codes into a Spark DataFrame."""
+
+    data = load_json()
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".json", delete=False) as tmp:
+        json.dump(data, tmp)
+        tmp_path = tmp.name
+
+    return spark_session.read.json(tmp_path)
+
+
+# ---------- Parquet Saver ----------
+def export_parquet(output_path: Union[str, Path]) -> Path:
+    """Export postal codes to a Parquet file."""
+
+    df = load_pandas()
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(output_path, index=False)
+    return output_path
+
+
+# ---------- CSV Saver ----------
+def export_csv(output_path: Union[str, Path]) -> Path:
+    """Export postal codes to a CSV file."""
+
+    df = load_pandas()
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index=False)
+    return output_path

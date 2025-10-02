@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))
 
-from postal_regex import loader
+from postal_regex import bulk
 
 
 # ----------------- Helpers -----------------
@@ -34,12 +34,12 @@ def is_spark_available():
 @pytest.mark.benchmark
 def test_validate_speed(benchmark):
     """Benchmark validate() on all sample valid codes"""
-    data = loader.load_json()
-    from postal_regex import validator
+    data = bulk.load_json()
+    from postal_regex.core import validate
 
     def run_validation():
         for entry in data:
-            validator.validate(entry["country_code"], entry["sample_valid"])
+            validate(entry["country_code"], entry["sample_valid"])
 
     benchmark(run_validation)
 
@@ -47,7 +47,7 @@ def test_validate_speed(benchmark):
 @pytest.mark.benchmark
 def test_load_json_speed(benchmark):
     """Benchmark loading postal codes from JSON"""
-    benchmark(loader.load_json)
+    benchmark(bulk.load_json)
 
 
 @pytest.mark.benchmark
@@ -56,7 +56,7 @@ def test_load_parquet_speed(benchmark, tmp_path):
     import pandas as pd
 
     parquet_file = tmp_path / "postal_codes.parquet"
-    loader.export_parquet(parquet_file)
+    bulk.export_parquet(parquet_file)
 
     def load_parquet():
         pd.read_parquet(parquet_file)
@@ -74,12 +74,12 @@ def test_load_spark_speed(benchmark):
 
     spark = (
         SparkSession.builder.master("local[1]")
-        .appName("BenchmarkPostalLoader")
+        .appName("BenchmarkPostalbulk")
         .getOrCreate()
     )
 
     def load_spark():
-        loader.load_spark(spark)
+        bulk.load_spark(spark)
 
     benchmark(load_spark)
     spark.stop()
