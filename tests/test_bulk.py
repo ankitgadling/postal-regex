@@ -110,7 +110,17 @@ def test_validate_spark_dataframe_edge_cases():
     from pyspark.sql import SparkSession
     from pyspark.sql import Row
 
-    spark = SparkSession.builder.master("local[1]").appName("TestPostal").getOrCreate()
+    # Build path to your source dir (or wheel)
+    project_root = Path(__file__).resolve().parent.parent
+    src_dir = project_root / "src"
+
+    spark = (
+        SparkSession.builder.master("local[1]")
+        .appName("TestPostal")
+        .config("spark.submit.pyFiles", str(src_dir))  # 👈 ship src/ to workers
+        .getOrCreate()
+    )
+
     data = [
         Row(country="FR", postal_code="75001"),
         Row(country="DE", postal_code="10115"),
@@ -126,7 +136,6 @@ def test_validate_spark_dataframe_edge_cases():
     assert [row["country_norm"] for row in rows] == ["FR", "DE", None]
 
     spark.stop()
-
 
 # ----------------- bulk load Tests -----------------
 def test_load_json():
