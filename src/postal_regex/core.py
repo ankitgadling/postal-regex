@@ -3,6 +3,7 @@ import regex  # safer regex engine with timeout support
 from functools import lru_cache
 from dataclasses import dataclass
 from importlib.resources import files
+from . import analytics
 
 # ---------------------------
 # Data Loading
@@ -67,11 +68,19 @@ def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) ->
     Validate a postal code against the regex pattern for a given country.
     Timeout (default 100ms) prevents ReDoS hangs.
     """
-    entry = get_entry(country_identifier)
     try:
-        return bool(entry.regex.fullmatch(postal_code, timeout=timeout))
-    except regex.TimeoutError:
-        return False  # treat timeout as invalid
+        entry = get_entry(country_identifier)
+        is_valid = bool(entry.regex.fullmatch(postal_code, timeout=timeout))
+    except (regex.TimeoutError, ValueError):
+        is_valid = False
+    # --- Record the validation attempt ---
+    try:
+        country_code = normalize(country_identifier)
+        analytics.record_validation(country_code, is_valid)
+    except ValueError:
+        pass
+
+    return is_valid
 
 
 def get_supported_countries():
