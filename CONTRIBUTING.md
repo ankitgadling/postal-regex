@@ -1,8 +1,7 @@
-
 ---
 # Contributing to Postal Regex Repository
 
-Thank you for your interest in contributing! 🎉
+Thank you for your interest in contributing! 
 This guide will help you add new countries, maintain consistency, and ensure your contributions pass automated tests.
 
 ---
@@ -27,6 +26,8 @@ All country data is stored in `src/postal_regex/data/postal_codes.json`. Each en
 * `postal_code_regex` → regex pattern for postal/pincode validation
 * `sample_valid` → a valid postal code example for testing
 * `sample_invalid` → an invalid postal code example for testing
+* `local_name` → country name in local language
+* `description` → brief description about postal codes
 
 ### Example Entry
 
@@ -36,7 +37,9 @@ All country data is stored in `src/postal_regex/data/postal_codes.json`. Each en
   "country_name": "Germany",
   "postal_code_regex": "^[0-9]{5}$",
   "sample_valid": "10115",
-  "sample_invalid": "ABCDE"
+  "sample_invalid": "ABCDE",
+  "local_name": "Deutschland",
+  "description": "German postal codes (PLZ) are five digits; the first two digits denote the region."
 }
 ```
 
@@ -46,6 +49,7 @@ All country data is stored in `src/postal_regex/data/postal_codes.json`. Each en
 * Add one country per PR whenever possible for easier review.
 
 ---
+
 ## Creating an Issue
 
 If you notice missing data, incorrect regex, or want to propose a new feature:

@@ -25,6 +25,7 @@ from .analytics import (
     record_validation,
     show_stats,
     reset_stats,
+    get_stats,
 )
 
 __all__ = [
