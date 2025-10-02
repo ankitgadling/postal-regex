@@ -31,6 +31,14 @@
       "sample_invalid": {
         "type": "string",
         "description": "An invalid postal code sample for this country"
+      },
+      "local_name": {
+        "type": "string",
+        "description": "Country name in local language"
+      },
+      "description": {
+        "type": "string",
+        "description": "Description of postal code format"
       }
     },
     "additionalProperties": false
