@@ -36,8 +36,19 @@
   {"country_code": "RO", "country_name": "Romania", "postal_code_regex": "^[0-9]{6}$", "sample_valid": "010011", "sample_invalid": "ABCDE"},
   {"country_code": "CZ", "country_name": "Czech Republic", "postal_code_regex": "^[0-9]{3} ?[0-9]{2}$", "sample_valid": "110 00", "sample_invalid": "ABCDE"},
   {"country_code": "AT", "country_name":"Austria", "postal_code_regex": "^[0-9]{4}$", "sample_valid": "1010", "sample_invalid": "ABCDE"},
-  {"country_code": "HR", "country_name": "Croatia","postal_code_regex": "^[1-5][0-9]{4}$","sample_valid": "10000", "sample_invalid": "ABCDE"},
-  {"country_code": "EG", "country_name": "Egypt", "postal_code_regex": "^[1-9][0-9]{4}$","sample_valid": "11511","sample_invalid": "ABCDE"},
-  {"country_code": "TH", "country_name": "Thailand", "postal_code_regex": "^[1-9][0-9]{4}$","sample_valid": "10110","sample_invalid": "ABCDE"},
-  {"country_code": "MA","country_name": "Morocco","postal_code_regex": "^[1-9][0-9]{4}$","sample_valid": "10000","sample_invalid": "ABCDE"}
+  {"country_code": "HR", "country_name": "Croatia", "postal_code_regex": "^[1-5][0-9]{4}$", "sample_valid": "10000", "sample_invalid": "ABCDE"},
+  {"country_code": "EG", "country_name": "Egypt", "postal_code_regex": "^[1-9][0-9]{4}$", "sample_valid": "11511", "sample_invalid": "ABCDE"},
+  {"country_code": "TH", "country_name": "Thailand", "postal_code_regex": "^[1-9][0-9]{4}$", "sample_valid": "10110", "sample_invalid": "ABCDE"},
+  {"country_code": "MA", "country_name": "Morocco","postal_code_regex": "^[1-9][0-9]{4}$","sample_valid": "10000", "sample_invalid": "ABCDE"},
+  {"country_code": "PH", "country_name": "Philippines", "postal_code_regex": "^[0-9]{4}$", "sample_valid": "1000", "sample_invalid": "ABCDE"},
+  {"country_code": "CL", "country_name": "Chile", "postal_code_regex": "^\\d{7}$", "sample_valid": "8320000", "sample_invalid": "12345"},
+  {"country_code": "IL", "country_name": "Israel", "postal_code_regex": "^\\d{7}$", "sample_valid": "9614303", "sample_invalid": "ABCDE"},
+  {"country_code": "MY", "country_name": "Malaysia", "postal_code_regex": "^\\d{5}$", "sample_valid": "50450", "sample_invalid": "ABCDE"},
+  {"country_code": "VN", "country_name": "Vietnam", "postal_code_regex": "^\\d{6}$", "sample_valid": "700000", "sample_invalid": "ABCDE"},
+  {"country_code": "UY", "country_name": "Uruguay", "postal_code_regex": "^[0-9]{5}$", "sample_valid": "11600", "sample_invalid": "ABCDE"},
+  {"country_code": "CO", "country_name": "Colombia", "postal_code_regex": "^[0-9]{6}$", "sample_valid": "110011", "sample_invalid": "12345"},
+  {"country_code": "PE", "country_name": "Peru", "postal_code_regex": "^[0-9]{5}$", "sample_valid": "15001", "sample_invalid": "ABCDE"},
+  {"country_code": "EC", "country_name": "Ecuador", "postal_code_regex": "^[0-9]{6}$", "sample_valid": "170135", "sample_invalid": "12345"},
+  {"country_code": "CR", "country_name": "Costa Rica", "postal_code_regex": "^[0-9]{5}$", "sample_valid": "10101", "sample_invalid": "ABCDE"}
 ]
+

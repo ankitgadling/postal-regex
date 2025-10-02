@@ -50,6 +50,7 @@ def export_parquet(output_path: Union[str, Path]) -> Path:
     df.to_parquet(output_path, index=False)
     return output_path
 
+
 # ---------- CSV Saver ----------
 def export_csv(output_path: Union[str, Path]) -> Path:
     """Export postal codes to a CSV file."""
