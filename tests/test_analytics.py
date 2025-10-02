@@ -46,6 +46,25 @@ def test_record_validation_and_load_stats(monkeypatch):
 
     temp_stats_file.unlink()
 
+def test_get_stats(monkeypatch):
+    """
+    Test that get_stats correctly reads and returns data.
+    """
+    temp_stats_file = Path.home() / ".postalregex_stats_temp.json"
+    monkeypatch.setattr(analytics, 'STATS_FILE', temp_stats_file)
+
+    # 1. Test when file doesn't exist
+    if temp_stats_file.exists():
+        temp_stats_file.unlink()
+    assert analytics.get_stats() == {}
+
+    dummy_data = {"US": {"valid": 5, "invalid": 1}}
+    with open(temp_stats_file, "w") as f:
+        json.dump(dummy_data, f)
+    
+    assert analytics.get_stats() == dummy_data
+    
+    temp_stats_file.unlink()
 
 def test_reset_stats(monkeypatch):
     """

@@ -47,9 +47,28 @@ def reset_stats():
     else:
         print("No statistics file found to reset.")
 
+def get_stats() -> dict:
+    """
+    Loads and returns the validation statistics from the stats file.
+    This function only retrieves data and does not print anything.
+    
+    Returns:
+        dict: A dictionary containing the validation stats, or an empty dict if none exist.
+    """
+    if not STATS_FILE.exists():
+        return {}
+    try:
+        with open(STATS_FILE, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return {}
+
 def show_stats():
-    """Display the validation statistics dashboard in the console."""
-    stats = _load_stats()
+    """
+    Loads and prints a formatted dashboard of the validation statistics.
+    This function handles all presentation logic.
+    """
+    stats = get_stats() # This is the main change: call the new data function
     if not stats:
         print("No validation statistics recorded yet.")
         return
@@ -67,7 +86,6 @@ def show_stats():
 
     # --- Print Table ---
     print("\nPostal Code Validation Stats (Local Project)")
-    # A simple formatted table without external dependencies
     header = ["Country", "Valid", "Invalid", "Total"]
     col_widths = [len(h) for h in header]
     for row in table_data:
