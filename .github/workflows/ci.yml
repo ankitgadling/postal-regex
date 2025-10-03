@@ -1,4 +1,5 @@
-name: ci
+# .github/workflows/ci.yml
+name: CI - Tests, Lint, Format, Type Check
 
 on:
   push:
@@ -7,7 +8,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  test-lint-type:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,11 +28,19 @@ jobs:
           pip install -r requirements-dev.txt
           pip install -r requirements.txt
           pip install -e .
+          pip install black flake8 mypy
+
+      - name: Check code formatting with Black
+        run: black --check src tests
+
+      - name: Run Flake8 linter
+        run: flake8 src tests
+
+      - name: Run Mypy type checking
+        run: mypy src
 
       - name: Run all tests
-        run: |
-          pytest -v --benchmark-disable
+        run: pytest -v --benchmark-disable
 
-      - name: Run benchmarks
-        run: |
-          pytest -v tests/test_performance.py --benchmark-only
+      - name: Run performance benchmarks
+        run: pytest -v tests/test_performance.py --benchmark-only
