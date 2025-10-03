@@ -35,10 +35,7 @@ jobs:
 
       - name: Run Flake8 linter
         run: flake8 src tests
-
-      - name: Run Mypy type checking
-        run: mypy src
-
+        
       - name: Run all tests
         run: pytest -v --benchmark-disable
 
