@@ -3,6 +3,7 @@ from pathlib import Path
 
 STATS_FILE = Path.home() / ".postalregex_stats.json"
 
+
 def _load_stats():
     """Load statistics from the local JSON file."""
     if not STATS_FILE.exists():
@@ -13,10 +14,12 @@ def _load_stats():
         except json.JSONDecodeError:
             return {}
 
+
 def _save_stats(stats):
     """Save statistics to the local JSON file."""
     with open(STATS_FILE, "w") as f:
         json.dump(stats, f, indent=2)
+
 
 def record_validation(country_code, is_valid):
     """
@@ -27,7 +30,7 @@ def record_validation(country_code, is_valid):
         is_valid (bool): True if the validation was successful, False otherwise.
     """
     stats = _load_stats()
-    
+
     # Ensure the country entry exists
     if country_code not in stats:
         stats[country_code] = {"valid": 0, "invalid": 0}
@@ -39,6 +42,7 @@ def record_validation(country_code, is_valid):
         stats[country_code]["invalid"] += 1
     _save_stats(stats)
 
+
 def reset_stats():
     """Clear all recorded statistics."""
     if STATS_FILE.exists():
@@ -47,13 +51,15 @@ def reset_stats():
     else:
         print("No statistics file found to reset.")
 
+
 def get_stats() -> dict:
     """
     Loads and returns the validation statistics from the stats file.
     This function only retrieves data and does not print anything.
-    
+
     Returns:
-        dict: A dictionary containing the validation stats, or an empty dict if none exist.
+        dict: A dictionary containing the validation stats,
+        or an empty dict if none exist.
     """
     if not STATS_FILE.exists():
         return {}
@@ -63,12 +69,13 @@ def get_stats() -> dict:
     except (json.JSONDecodeError, FileNotFoundError):
         return {}
 
+
 def show_stats():
     """
     Loads and prints a formatted dashboard of the validation statistics.
     This function handles all presentation logic.
     """
-    stats = get_stats() # This is the main change: call the new data function
+    stats = get_stats()  # This is the main change: call the new data function
     if not stats:
         print("No validation statistics recorded yet.")
         return

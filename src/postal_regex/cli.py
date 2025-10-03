@@ -1,11 +1,10 @@
 import argparse
 from . import analytics
 
+
 def main():
     """Main function for the command-line interface."""
-    parser = argparse.ArgumentParser(
-        description="Postal Regex command-line tools."
-    )
+    parser = argparse.ArgumentParser(description="Postal Regex command-line tools.")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # The 'stats' command
@@ -25,6 +24,7 @@ def main():
             analytics.show_stats()
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()

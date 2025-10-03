@@ -49,5 +49,5 @@ __all__ = [
     "record_validation",
     "show_stats",
     "reset_stats",
-    "get_stats"
+    "get_stats",
 ]

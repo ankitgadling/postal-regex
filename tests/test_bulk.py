@@ -137,6 +137,7 @@ def test_validate_spark_dataframe_edge_cases():
 
     spark.stop()
 
+
 # ----------------- bulk load Tests -----------------
 def test_load_json():
     data = load_json()

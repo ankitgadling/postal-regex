@@ -73,6 +73,7 @@ def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) ->
     except regex.TimeoutError:
         return False
 
+
 def get_supported_countries():
     """
     Retrieve supported countries for postal code validation.
