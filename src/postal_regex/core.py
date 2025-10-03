@@ -71,8 +71,7 @@ def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) ->
     try:
         return bool(entry.regex.fullmatch(postal_code, timeout=timeout))
     except regex.TimeoutError:
-        return False  # treat timeout as invalid
-
+        return False
 
 def get_supported_countries():
     """
