@@ -1,4 +1,3 @@
-
 # Postal Regex 📨
 
 [![PyPI version](https://img.shields.io/pypi/v/postal-regex.svg)](https://pypi.org/project/postal-regex/)
@@ -107,6 +106,58 @@ df = pd.DataFrame({
 })
 df_validated = validate_dataframe(df, country_col="country", postal_col="postal_code")
 print(df_validated)
+```
+
+---
+
+## Command-Line Usage
+
+You can validate postal codes directly from the command line without writing any code.
+
+### Validate Postal Codes
+
+To validate one or more postal codes for a specific country:
+
+```sh
+python -m postal_regex.cli validate <postal_code1> <postal_code2> ... <country>
+```
+
+**Examples:**
+
+Validate a single code for India:
+```
+python -m postal_regex.cli validate 110001 IN
+```
+Output:
+```
+110001: Valid
+```
+
+Validate multiple codes for the United States:
+```
+python -m postal_regex.cli validate 12345 90210 US
+```
+Output:
+```
+12345: Valid
+90210: Valid
+```
+
+You can also use country names:
+```
+python -m postal_regex.cli validate 110001 India
+```
+
+### View Validation Statistics
+
+To view local validation statistics:
+```
+python -m postal_regex.cli stats
+```
+
+To reset statistics:
+```
+python -m postal_regex.cli stats --reset
 ```
 
 ---
