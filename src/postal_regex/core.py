@@ -89,3 +89,12 @@ def get_country_regex(country_identifier: str) -> str:
     """
     entry = get_entry(country_identifier)
     return entry.regex.pattern
+
+def extract_postal_code(country_identifier: str, text: str) -> str | None:
+    """
+    Extract the first postal code from text that matches the country's regex pattern.
+    Returns None if no match is found.
+    """
+    pattern = get_country_regex(country_identifier)
+    match = regex.search(pattern.strip('^$'), text)
+    return match.group(0) if match else None
