@@ -34,6 +34,26 @@ validate("India", "110001")   # True
 validate("US", "12345-6789")  # True
 ````
 
+## Examples for recently added countries (Indonesia, Bangladesh, Pakistan, Sri Lanka, Nepal)
+```python
+
+# Indonesia (ID)
+validate("ID", "12345")           # **Expected: True** (valid 5-digit code)
+validate("Indonesia", "12345")    # **Expected: True**
+
+# Bangladesh (BD)
+validate("BD", "1205")            # **Expected: True** (valid 4-digit code)
+
+# Pakistan (PK)
+validate("PK", "44000")           # **Expected: True** (valid 5-digit code)
+
+# Sri Lanka (LK)
+validate("LK", "00300")           # **Expected: True** (valid 5-digit code, e.g., Colombo)
+
+# Nepal (NP)
+validate("NP", "44600")           # **Expected: True** (valid 5-digit code, e.g., Kathmandu)
+```
+
 * ✅ Normalize country identifiers
 
 ```python
