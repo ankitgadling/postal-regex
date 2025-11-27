@@ -9,6 +9,7 @@ SRC_DIR = PROJECT_ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))
 
 from postal_regex import core
+from postal_regex.errors import CountryNotSupportedError
 
 # Load JSON the same way core.py does
 DATA_FILE = SRC_DIR / "postal_regex" / "data" / "postal_codes.json"
@@ -39,7 +40,12 @@ def test_normalize(entry):
 
 
 def test_invalid_country_raises():
-    with pytest.raises(ValueError):
+    with pytest.raises(CountryNotSupportedError) as exc_info:
         core.validate("XX", "12345")
-    with pytest.raises(ValueError):
+    assert "XX" in str(exc_info.value)
+    assert exc_info.value.country_identifier == "XX"
+
+    with pytest.raises(CountryNotSupportedError) as exc_info:
         core.normalize("NotACountry")
+    assert "NotACountry" in str(exc_info.value)
+    assert exc_info.value.country_identifier == "NotACountry"

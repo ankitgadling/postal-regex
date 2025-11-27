@@ -3,14 +3,22 @@ import regex  # safer regex engine with timeout support
 from functools import lru_cache
 from dataclasses import dataclass
 from importlib.resources import files
+from .errors import DataLoadError, CountryNotSupportedError
 
 # ---------------------------
 # Data Loading
 # ---------------------------
 DATA_FILE = files("postal_regex.data") / "postal_codes.json"
 
-with DATA_FILE.open("r", encoding="utf-8") as f:
-    _raw_data = json.load(f)
+try:
+    with DATA_FILE.open("r", encoding="utf-8") as f:
+        _raw_data = json.load(f)
+except FileNotFoundError as e:
+    raise DataLoadError(str(DATA_FILE), e) from e
+except json.JSONDecodeError as e:
+    raise DataLoadError(str(DATA_FILE), e) from e
+except Exception as e:
+    raise DataLoadError(str(DATA_FILE), e) from e
 
 
 @dataclass(frozen=True)
@@ -45,17 +53,41 @@ for entry in _raw_data:
 def normalize(identifier: str) -> str:
     """
     Normalize a country identifier (code or name) to its ISO 3166-1 alpha-2 code.
+
+    Args:
+        identifier: Country code (e.g., "US") or country name (e.g., "United States").
+
+    Returns:
+        ISO 3166-1 alpha-2 country code (e.g., "US").
+
+    Raises:
+        CountryNotSupportedError: If the country identifier is not recognized.
+
+    Example:
+        >>> normalize("US")
+        'US'
+        >>> normalize("United States")
+        'US'
     """
     key = identifier.strip().upper()
     entry = COUNTRY_INDEX.get(key)
     if not entry:
-        raise ValueError(f"No match found for '{identifier}'")
+        raise CountryNotSupportedError(identifier)
     return entry.country_code
 
 
 def get_entry(identifier: str) -> CountryRecord:
     """
     Retrieve the CountryRecord for a given country identifier.
+
+    Args:
+        identifier: Country code (e.g., "US") or country name (e.g., "United States").
+
+    Returns:
+        CountryRecord containing country code, name, and compiled regex pattern.
+
+    Raises:
+        CountryNotSupportedError: If the country identifier is not recognized.
     """
     code = normalize(identifier)
     return BY_CODE[code]
@@ -66,6 +98,25 @@ def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) ->
     """
     Validate a postal code against the regex pattern for a given country.
     Timeout (default 100ms) prevents ReDoS hangs.
+
+    Args:
+        country_identifier: Country code (e.g., "US") or country name
+                          (e.g., "United States").
+        postal_code: The postal code to validate.
+        timeout: Maximum time (in seconds) to spend on regex matching.
+                Default is 0.1 seconds.
+
+    Returns:
+        True if the postal code matches the country's pattern, False otherwise.
+
+    Raises:
+        CountryNotSupportedError: If the country identifier is not recognized.
+
+    Example:
+        >>> validate("US", "90210")
+        True
+        >>> validate("US", "INVALID")
+        False
     """
     entry = get_entry(country_identifier)
     try:
@@ -86,6 +137,20 @@ def get_supported_countries():
 def get_country_regex(country_identifier: str) -> str:
     """
     Retrieve the postal code regex pattern for a given country.
+
+    Args:
+        country_identifier: Country code (e.g., "US") or country name
+                          (e.g., "United States").
+
+    Returns:
+        The regex pattern string for the country's postal code format.
+
+    Raises:
+        CountryNotSupportedError: If the country identifier is not recognized.
+
+    Example:
+        >>> get_country_regex("US")
+        '^[0-9]{5}(-[0-9]{4})?$'
     """
     entry = get_entry(country_identifier)
     return entry.regex.pattern
