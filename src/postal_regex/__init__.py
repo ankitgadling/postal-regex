@@ -28,6 +28,14 @@ from .analytics import (
     get_stats,
 )
 
+# Custom exception classes
+from .errors import (
+    PostalRegexError,
+    CountryNotSupportedError,
+    InvalidPostalCodeError,
+    DataLoadError,
+)
+
 __all__ = [
     # Core
     "validate",
@@ -50,4 +58,9 @@ __all__ = [
     "show_stats",
     "reset_stats",
     "get_stats",
+    # Exceptions
+    "PostalRegexError",
+    "CountryNotSupportedError",
+    "InvalidPostalCodeError",
+    "DataLoadError",
 ]
