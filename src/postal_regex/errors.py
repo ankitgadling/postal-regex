@@ -50,7 +50,10 @@ class CountryNotSupportedError(PostalRegexError):
         """
         self.country_identifier = country_identifier
         if message is None:
-            message = f"Country '{country_identifier}' is not supported. Use get_supported_countries() to see available countries."
+            message = (
+                f"Country '{country_identifier}' is not supported. "
+                f"Use get_supported_countries() to see available countries."
+            )
         super().__init__(message)
 
 
@@ -70,12 +73,11 @@ class InvalidPostalCodeError(PostalRegexError):
         >>> try:
         ...     validate_strict("US", "INVALID")
         ... except InvalidPostalCodeError as e:
-        ...     print(f"Postal code '{e.postal_code}' is invalid for {e.country_identifier}")
+        ...     print(f"Postal code '{e.postal_code}' is invalid "
+        ...           f"for {e.country_identifier}")
     """
 
-    def __init__(
-        self, country_identifier: str, postal_code: str, message: str = None
-    ):
+    def __init__(self, country_identifier: str, postal_code: str, message: str = None):
         """
         Initialize InvalidPostalCodeError.
 
@@ -89,7 +91,8 @@ class InvalidPostalCodeError(PostalRegexError):
         self.postal_code = postal_code
         if message is None:
             message = (
-                f"Postal code '{postal_code}' is invalid for country '{country_identifier}'."
+                f"Postal code '{postal_code}' is invalid "
+                f"for country '{country_identifier}'."
             )
         super().__init__(message)
 
@@ -134,7 +137,9 @@ class DataLoadError(PostalRegexError):
         if message is None:
             base_msg = f"Failed to load postal codes data from '{file_path}'."
             if original_error:
-                base_msg += f" Original error: {type(original_error).__name__}: {original_error}"
+                base_msg += (
+                    f" Original error: {type(original_error).__name__}: "
+                    f"{original_error}"
+                )
             message = base_msg
         super().__init__(message)
-

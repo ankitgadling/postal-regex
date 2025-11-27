@@ -100,9 +100,11 @@ def validate(country_identifier: str, postal_code: str, timeout: float = 0.1) ->
     Timeout (default 100ms) prevents ReDoS hangs.
 
     Args:
-        country_identifier: Country code (e.g., "US") or country name (e.g., "United States").
+        country_identifier: Country code (e.g., "US") or country name
+                          (e.g., "United States").
         postal_code: The postal code to validate.
-        timeout: Maximum time (in seconds) to spend on regex matching. Default is 0.1 seconds.
+        timeout: Maximum time (in seconds) to spend on regex matching.
+                Default is 0.1 seconds.
 
     Returns:
         True if the postal code matches the country's pattern, False otherwise.
@@ -137,7 +139,8 @@ def get_country_regex(country_identifier: str) -> str:
     Retrieve the postal code regex pattern for a given country.
 
     Args:
-        country_identifier: Country code (e.g., "US") or country name (e.g., "United States").
+        country_identifier: Country code (e.g., "US") or country name
+                          (e.g., "United States").
 
     Returns:
         The regex pattern string for the country's postal code format.

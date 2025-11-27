@@ -1,8 +1,8 @@
 import argparse
 import sys
 from . import analytics
-from .core import validate, get_supported_countries
-from .errors import PostalRegexError, CountryNotSupportedError, DataLoadError
+from .core import validate
+from .errors import PostalRegexError, CountryNotSupportedError
 
 
 def main():

@@ -224,4 +224,3 @@ class TestExceptionIntegration:
             except PostalRegexError:
                 # All should be catchable as base exception
                 assert True
-

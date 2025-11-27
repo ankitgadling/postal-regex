@@ -27,9 +27,11 @@ def bulk_validate(
     Validate an iterable of postal codes for a given country.
 
     Args:
-        country_identifier: Country code (e.g., "US") or country name (e.g., "United States").
+        country_identifier: Country code (e.g., "US") or country name
+                           (e.g., "United States").
         postal_codes: An iterable of postal codes to validate.
-        timeout: Maximum time (in seconds) to spend on regex matching per code. Default is 0.1 seconds.
+        timeout: Maximum time (in seconds) to spend on regex matching per code.
+                Default is 0.1 seconds.
         parallel: If True, use multiprocessing for parallel validation.
         workers: Number of worker processes (defaults to CPU count if parallel=True).
         as_generator: If True, return a generator instead of a list.
@@ -129,7 +131,8 @@ def validate_dataframe(df, country_col, postal_col, output_col="is_valid"):
         df: A Pandas or Dask DataFrame containing postal code data.
         country_col: Name of the column containing country identifiers.
         postal_col: Name of the column containing postal codes.
-        output_col: Name of the column to store validation results. Default is "is_valid".
+        output_col: Name of the column to store validation results.
+                   Default is "is_valid".
 
     Returns:
         The DataFrame with a new column containing validation results.
@@ -137,8 +140,10 @@ def validate_dataframe(df, country_col, postal_col, output_col="is_valid"):
     Raises:
         ImportError: If neither pandas nor dask is installed.
         TypeError: If df is not a Pandas or Dask DataFrame.
-        CountryNotSupportedError: If any country identifier in the DataFrame is not recognized
-                                 (though this is handled gracefully by returning False for invalid countries).
+        CountryNotSupportedError: If any country identifier in the DataFrame
+                                 is not recognized (though this is handled
+                                 gracefully by returning False for invalid
+                                 countries).
 
     Example:
         >>> import pandas as pd
@@ -224,7 +229,8 @@ def validate_spark_dataframe(df, country_col, postal_col, output_col="is_valid")
         df: A Spark DataFrame containing postal code data.
         country_col: Name of the column containing country identifiers.
         postal_col: Name of the column containing postal codes.
-        output_col: Name of the column to store validation results. Default is "is_valid".
+        output_col: Name of the column to store validation results.
+                   Default is "is_valid".
 
     Returns:
         The Spark DataFrame with a new column containing validation results.
@@ -232,12 +238,15 @@ def validate_spark_dataframe(df, country_col, postal_col, output_col="is_valid")
     Raises:
         ImportError: If pyspark is not installed.
         CountryNotSupportedError: If any country identifier is not recognized
-                                 (though this is handled gracefully by returning False for invalid countries).
+                                 (though this is handled gracefully by
+                                 returning False for invalid countries).
 
     Example:
         >>> from pyspark.sql import SparkSession
         >>> spark = SparkSession.builder.appName("test").getOrCreate()
-        >>> df = spark.createDataFrame([("US", "90210"), ("CA", "K1A 0B1")], ["country", "postal"])
+        >>> df = spark.createDataFrame(
+        ...     [("US", "90210"), ("CA", "K1A 0B1")], ["country", "postal"]
+        ... )
         >>> result = validate_spark_dataframe(df, "country", "postal")
     """
     from pyspark.sql.functions import col, udf
